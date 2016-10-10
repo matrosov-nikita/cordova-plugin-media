@@ -513,6 +513,46 @@ exports.defineAutoTests = function () {
             media.play();
         });
 
+        it("media.spec.27.1 should trigger onStatus callback with MEDIA_STARTING status", function (done) {
+            //bb10 dialog pops up, preventing tests from running
+            if (!isAudioSupported || cordova.platformId === 'blackberry10') {
+                pending();
+            }
+            var mediaFile = WEB_MP3_STREAM;
+            var media = null;
+            var context = this;
+            var beenStarting = false;
+            var safeDone = function () {
+                if (!context.done) {
+                    media.release();
+                    context.done = true;
+                    done();
+                }
+            };
+            var errorCallback = jasmine.createSpy('errorCallback').and.callFake(
+                function (e) {
+                    expect(beenStarting).toBe(true);
+                    safeDone();
+                });
+
+            var successCallback = function () {
+                expect(true).toBe(true);
+                safeDone();
+            };
+
+            var mediaStartingSupported = ['android', 'ios', 'windows'].indexOf(cordova.platformId) > 0;
+            var statusChange = function (s) {
+                if (s == Media.MEDIA_STARTING) {
+                    beenStarting = true;
+                }
+                else {
+                    expect(beenStarting || !mediaStartingSupported).toBeTruthy();
+                    media.stop();
+                }
+            };
+            media = new Media(mediaFile, successCallback, errorCallback, statusChange);
+            media.play();
+        });
     });
 };
 

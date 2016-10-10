@@ -472,6 +472,8 @@
         }
         bError = YES;
     } else {
+        NSString * jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%d);", @"cordova.require('cordova-plugin-media.Media').onStatus", mediaId, MEDIA_STATE, MEDIA_STARTING];
+        [self.commandDelegate evalJs:jsString];
         audioFile.player.mediaId = mediaId;
         audioFile.player.delegate = self;
         if (avPlayer == nil)
